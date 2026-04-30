@@ -27,7 +27,7 @@ export const Scanner = () => {
           const { isNew, record } = addRecord(decodedText)
           const newAchievements = isNew ? checkAndUnlock([record, ...records]) : []
           setFound({ record, isNew, achievements: newAchievements })
-          scanner.stop().catch(() => {})
+          releaseCamera()
           setScanning(false)
         },
         () => {}
@@ -38,12 +38,26 @@ export const Scanner = () => {
     }
   }
 
+  const releaseCamera = async () => {
+    const scanner = scannerRef.current
+    if (!scanner) return
+    try {
+      if (scanner.isScanning) await scanner.stop()
+    } catch { /* already stopped */ }
+    try { scanner.clear() } catch { /* ignore */ }
+    // html5-qrcode が body に残したビデオトラックを強制解放
+    document.querySelectorAll('video').forEach(v => {
+      (v.srcObject as MediaStream)?.getTracks().forEach(t => t.stop())
+      v.srcObject = null
+    })
+  }
+
   const stopScan = () => {
-    scannerRef.current?.stop().catch(() => {})
+    releaseCamera()
     setScanning(false)
   }
 
-  useEffect(() => () => { scannerRef.current?.stop().catch(() => {}) }, [])
+  useEffect(() => () => { releaseCamera() }, [])
 
   return (
     <div className={styles.page}>
