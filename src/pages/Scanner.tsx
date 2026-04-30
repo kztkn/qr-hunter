@@ -48,7 +48,7 @@ export const Scanner = () => {
   return (
     <div className={styles.page}>
       <div className={styles.header}>
-        <h1 className={styles.logo}>QRハンター</h1>
+        <h1 className={styles.logo}>QRGO</h1>
         <div className={styles.count}>
           <span className={styles.countNum}>{records.length}</span>
           <span className={styles.countLabel}>発見</span>

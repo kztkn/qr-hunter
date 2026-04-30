@@ -81,3 +81,9 @@
   color: var(--success);
   margin-top: 4px;
 }
+
+.locked {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
