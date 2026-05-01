@@ -17,6 +17,9 @@ export const Scanner = () => {
 
   const startScan = async () => {
     setError('')
+    await releaseCamera()
+    const el = document.getElementById('qr-reader')
+    if (el) el.innerHTML = ''
     try {
       const scanner = new Html5Qrcode('qr-reader')
       scannerRef.current = scanner
@@ -41,6 +44,7 @@ export const Scanner = () => {
   const releaseCamera = async () => {
     const scanner = scannerRef.current
     if (!scanner) return
+    scannerRef.current = null
     try {
       if (scanner.isScanning) await scanner.stop()
     } catch { /* already stopped */ }
