@@ -1,38 +1,57 @@
-import { useState, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { ACHIEVEMENTS } from '../data/achievements'
 import type { Achievement, QRRecord } from '../types'
-
-const STORAGE_KEY = 'qr-hunter-achievements'
-
-const loadUnlocked = (): Record<string, string> => {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}')
-  } catch {
-    return {}
-  }
-}
+import { supabase } from '../lib/supabase'
 
 export const useAchievements = () => {
-  const [unlocked, setUnlocked] = useState<Record<string, string>>(loadUnlocked)
+  const [unlocked, setUnlocked] = useState<Record<string, string>>({})
 
-  const checkAndUnlock = useCallback((records: QRRecord[]): Achievement[] => {
-    const current = loadUnlocked()
+  useEffect(() => {
+    const fetchAchievements = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) return
+
+      const { data } = await supabase
+        .from('user_achievements')
+        .select('achievement_id, unlocked_at')
+
+      if (data) {
+        const map: Record<string, string> = {}
+        data.forEach(row => { map[row.achievement_id] = row.unlocked_at })
+        setUnlocked(map)
+      }
+    }
+
+    fetchAchievements()
+  }, [])
+
+  const checkAndUnlock = useCallback(async (records: QRRecord[]): Promise<Achievement[]> => {
+    const { data: { session } } = await supabase.auth.getSession()
+    const userId = session?.user?.id
+    const now = new Date().toISOString()
+
     const newlyUnlocked: Achievement[] = []
+    const toInsert: { user_id: string; achievement_id: string; unlocked_at: string }[] = []
 
     ACHIEVEMENTS.forEach(a => {
-      if (!current[a.id] && a.check(records)) {
-        current[a.id] = new Date().toISOString()
-        newlyUnlocked.push(a)
+      if (!unlocked[a.id] && a.check(records)) {
+        newlyUnlocked.push({ ...a, unlockedAt: now })
+        if (userId) toInsert.push({ user_id: userId, achievement_id: a.id, unlocked_at: now })
       }
     })
 
-    if (newlyUnlocked.length > 0) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(current))
-      setUnlocked({ ...current })
+    if (toInsert.length > 0) {
+      await supabase
+        .from('user_achievements')
+        .upsert(toInsert, { onConflict: 'user_id,achievement_id', ignoreDuplicates: true })
+
+      const newMap = { ...unlocked }
+      toInsert.forEach(r => { newMap[r.achievement_id] = r.unlocked_at })
+      setUnlocked(newMap)
     }
 
     return newlyUnlocked
-  }, [])
+  }, [unlocked])
 
   const achievements: Achievement[] = ACHIEVEMENTS.map(a => ({
     ...a,

@@ -20,10 +20,25 @@
   letter-spacing: -0.5px;
 }
 
+.headerRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
 .count {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+}
+
+.user {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--text-muted);
 }
 
 .countNum {
@@ -96,6 +111,10 @@
 
 .btnStart {
   width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
   padding: 18px;
   border-radius: 16px;
   background: var(--accent);
@@ -106,6 +125,10 @@
 
 .btnStop {
   width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
   padding: 18px;
   border-radius: 16px;
   background: var(--surface2);

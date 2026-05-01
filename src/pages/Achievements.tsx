@@ -1,3 +1,4 @@
+import { Lock, CheckCircle } from 'lucide-react'
 import { useAchievements } from '../hooks/useAchievements'
 import styles from './Achievements.module.css'
 
@@ -20,13 +21,15 @@ export const Achievements = () => {
       <div className={styles.grid}>
         {achievements.map(a => (
           <div key={a.id} className={`${styles.card} ${a.unlockedAt ? styles.unlocked : styles.locked}`}>
-            <div className={styles.icon}>{a.unlockedAt ? a.icon : '🔒'}</div>
+            <div className={styles.icon}>
+              {a.unlockedAt ? a.icon : <Lock size={28} strokeWidth={1.5} />}
+            </div>
             <div className={styles.info}>
               <p className={styles.name}>{a.name}</p>
               <p className={styles.desc}>{a.description}</p>
               {a.unlockedAt
-                ? <p className={styles.date}>✓ {formatDate(a.unlockedAt)}</p>
-                : <p className={styles.locked}>未解除</p>
+                ? <p className={styles.date}><CheckCircle size={11} style={{ display: 'inline', marginRight: 3 }} />{formatDate(a.unlockedAt)}</p>
+                : <p className={styles.lockedLabel}>未解除</p>
               }
             </div>
           </div>

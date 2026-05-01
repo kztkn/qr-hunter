@@ -115,9 +115,12 @@
   font-size: 15px;
 }
 
-.emptyIcon {
-  font-size: 48px;
-  margin-bottom: 8px;
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.spin {
+  animation: spin 1s linear infinite;
 }
 
 .emptyHint {

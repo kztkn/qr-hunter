@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { Html5Qrcode } from 'html5-qrcode'
+import { Camera, StopCircle, User } from 'lucide-react'
 import { FoundModal } from '../components/FoundModal'
 import { useCollection } from '../hooks/useCollection'
 import { useAchievements } from '../hooks/useAchievements'
+import { useAuth } from '../hooks/useAuth'
 import type { Achievement, QRRecord } from '../types'
 import styles from './Scanner.module.css'
 
@@ -14,6 +16,7 @@ export const Scanner = () => {
 
   const { records, addRecord } = useCollection()
   const { checkAndUnlock } = useAchievements()
+  const { username } = useAuth()
 
   const startScan = async () => {
     setError('')
@@ -26,11 +29,15 @@ export const Scanner = () => {
       await scanner.start(
         { facingMode: 'environment' },
         { fps: 10, qrbox: { width: 250, height: 250 } },
-        (decodedText) => {
-          const { isNew, record } = addRecord(decodedText)
-          const newAchievements = isNew ? checkAndUnlock([record, ...records]) : []
-          setFound({ record, isNew, achievements: newAchievements })
-          releaseCamera()
+        async (decodedText) => {
+          try {
+            const { isNew, record } = await addRecord(decodedText)
+            const newAchievements = isNew ? await checkAndUnlock([record, ...records]) : []
+            setFound({ record, isNew, achievements: newAchievements })
+          } catch {
+            setError('保存に失敗しました。再度お試しください。')
+          }
+          await releaseCamera()
           setScanning(false)
         },
         () => {}
@@ -49,7 +56,6 @@ export const Scanner = () => {
       if (scanner.isScanning) await scanner.stop()
     } catch { /* already stopped */ }
     try { scanner.clear() } catch { /* ignore */ }
-    // html5-qrcode が body に残したビデオトラックを強制解放
     document.querySelectorAll('video').forEach(v => {
       (v.srcObject as MediaStream)?.getTracks().forEach(t => t.stop())
       v.srcObject = null
@@ -67,9 +73,17 @@ export const Scanner = () => {
     <div className={styles.page}>
       <div className={styles.header}>
         <h1 className={styles.logo}>QRGO</h1>
-        <div className={styles.count}>
-          <span className={styles.countNum}>{records.length}</span>
-          <span className={styles.countLabel}>発見</span>
+        <div className={styles.headerRight}>
+          <div className={styles.count}>
+            <span className={styles.countNum}>{records.length}</span>
+            <span className={styles.countLabel}>発見</span>
+          </div>
+          {username && (
+            <div className={styles.user}>
+              <User size={13} />
+              <span>{username}</span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -87,9 +101,15 @@ export const Scanner = () => {
 
       <div className={styles.controls}>
         {scanning ? (
-          <button className={styles.btnStop} onClick={stopScan}>停止</button>
+          <button className={styles.btnStop} onClick={stopScan}>
+            <StopCircle size={20} />
+            停止
+          </button>
         ) : (
-          <button className={styles.btnStart} onClick={startScan}>📷 スキャン開始</button>
+          <button className={styles.btnStart} onClick={startScan}>
+            <Camera size={20} />
+            スキャン開始
+          </button>
         )}
       </div>
 

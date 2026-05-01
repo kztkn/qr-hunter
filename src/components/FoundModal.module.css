@@ -36,8 +36,9 @@
   margin-bottom: 12px;
 }
 
-.emoji {
-  font-size: 56px;
+.iconWrap {
+  display: flex;
+  justify-content: center;
   margin-bottom: 8px;
 }
 
@@ -63,6 +64,9 @@
 }
 
 .achievementBadge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   background: rgba(78, 204, 163, 0.15);
   border: 1px solid var(--success);
   color: var(--success);
@@ -80,6 +84,10 @@
 
 .btnSecondary {
   flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   padding: 12px;
   border-radius: 12px;
   background: var(--surface2);
@@ -90,6 +98,10 @@
 
 .btnPrimary {
   flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   padding: 12px;
   border-radius: 12px;
   background: var(--accent);

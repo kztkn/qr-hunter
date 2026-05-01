@@ -1,3 +1,4 @@
+import { Sparkles, Eye, ExternalLink, X, Star } from 'lucide-react'
 import type { Achievement, QRRecord } from '../types'
 import styles from './FoundModal.module.css'
 
@@ -15,14 +16,17 @@ export const FoundModal = ({ record, isNew, newAchievements, onClose, onOpenUrl 
       {isNew ? (
         <>
           <div className={styles.badge}>#{record.number}</div>
-          <div className={styles.emoji}>🎉</div>
+          <div className={styles.iconWrap}>
+            <Sparkles size={52} color="var(--accent)" strokeWidth={1.5} />
+          </div>
           <h2 className={styles.title}>発見！</h2>
           <p className={styles.domain}>{record.domain}</p>
           {newAchievements.length > 0 && (
             <div className={styles.achievements}>
               {newAchievements.map(a => (
                 <div key={a.id} className={styles.achievementBadge}>
-                  {a.icon} 実績解除: {a.name}
+                  <Star size={13} />
+                  実績解除: {a.name}
                 </div>
               ))}
             </div>
@@ -30,7 +34,9 @@ export const FoundModal = ({ record, isNew, newAchievements, onClose, onOpenUrl 
         </>
       ) : (
         <>
-          <div className={styles.emoji}>👀</div>
+          <div className={styles.iconWrap}>
+            <Eye size={52} color="var(--text-muted)" strokeWidth={1.5} />
+          </div>
           <h2 className={styles.title}>既発見</h2>
           <p className={styles.domain}>#{record.number} {record.domain}</p>
         </>
@@ -38,9 +44,11 @@ export const FoundModal = ({ record, isNew, newAchievements, onClose, onOpenUrl 
 
       <div className={styles.actions}>
         <button className={styles.btnSecondary} onClick={onClose}>
+          <X size={16} />
           閉じる
         </button>
         <button className={styles.btnPrimary} onClick={onOpenUrl}>
+          <ExternalLink size={16} />
           URLを開く
         </button>
       </div>

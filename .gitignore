@@ -1,3 +1,8 @@
+.env
+.env.local
+.mcp.json
+.claude/
+
 # Logs
 logs
 *.log

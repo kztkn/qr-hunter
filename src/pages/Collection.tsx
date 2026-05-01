@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Inbox, Loader2 } from 'lucide-react'
 import { useCollection } from '../hooks/useCollection'
 import type { QRRecord } from '../types'
 import styles from './Collection.module.css'
@@ -39,7 +40,7 @@ const RecordCard = ({ record }: { record: QRRecord }) => {
 }
 
 export const Collection = () => {
-  const { records } = useCollection()
+  const { records, loading } = useCollection()
 
   return (
     <div className={styles.page}>
@@ -48,9 +49,14 @@ export const Collection = () => {
         <span className={styles.total}>{records.length}個発見</span>
       </div>
 
-      {records.length === 0 ? (
+      {loading ? (
         <div className={styles.empty}>
-          <p className={styles.emptyIcon}>📭</p>
+          <Loader2 size={32} color="var(--text-muted)" className={styles.spin} />
+          <p>読み込み中...</p>
+        </div>
+      ) : records.length === 0 ? (
+        <div className={styles.empty}>
+          <Inbox size={40} color="var(--text-muted)" strokeWidth={1.5} />
           <p>まだQRコードを発見していません</p>
           <p className={styles.emptyHint}>スキャン画面から始めよう</p>
         </div>
